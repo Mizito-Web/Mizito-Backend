@@ -31,5 +31,5 @@ export class SubTask {
   updatedAt: Date;
 }
 
-export type TaskDocument = SubTask & Document;
-export const UserSchema = SchemaFactory.createForClass(SubTask);
+export type SubTaskDocument = SubTask & Document;
+export const SubTaskSchema = SchemaFactory.createForClass(SubTask);

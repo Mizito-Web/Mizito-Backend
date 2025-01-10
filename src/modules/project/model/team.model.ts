@@ -28,4 +28,4 @@ export class Team {
 }
 
 export type TaskDocument = Team & Document;
-export const UserSchema = SchemaFactory.createForClass(Team);
+export const TeamSchema = SchemaFactory.createForClass(Team);

@@ -27,5 +27,5 @@ export class Report {
   updatedAt: Date;
 }
 
-export type TaskDocument = Report & Document;
-export const UserSchema = SchemaFactory.createForClass(Report);
+export type ReportDocument = Report & Document;
+export const ReportSchema = SchemaFactory.createForClass(Report);

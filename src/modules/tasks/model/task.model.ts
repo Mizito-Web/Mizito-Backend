@@ -54,4 +54,4 @@ export class Task {
 }
 
 export type TaskDocument = Task & Document;
-export const UserSchema = SchemaFactory.createForClass(Task);
+export const TaskSchema = SchemaFactory.createForClass(Task);

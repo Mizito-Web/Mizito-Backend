@@ -32,4 +32,4 @@ export class Project {
 }
 
 export type ProjectDocument = Project & Document;
-export const UserSchema = SchemaFactory.createForClass(Project);
+export const ProjectSchema = SchemaFactory.createForClass(Project);
