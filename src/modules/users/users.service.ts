@@ -26,10 +26,7 @@ export class UsersService {
 
   async getUserUsedValidateUser(query: object): Promise<UserLoginData> {
     return await this.userModel
-      .findOne(
-        query,
-        'email password type registerType status firstName lastName'
-      )
+      .findOne(query, 'email password type status firstName lastName')
       .lean();
   }
 

@@ -19,14 +19,6 @@ export class User {
   @Prop({ required: false })
   email: string;
 
-  @ApiProperty({ description: 'it is a token for recovery user account' })
-  @Prop({ required: false })
-  accountRecoveryToken: string;
-
-  @ApiProperty({ description: 'it is a session validation key' })
-  @Prop({ required: false })
-  sessionValidationKey: string;
-
   @Prop({ type: String, select: false })
   password: string;
 
@@ -48,12 +40,19 @@ export class User {
   @Prop({ required: false, select: false })
   refreshToken: string;
 
-  @Prop({
-    select: false,
-    enum: USER.REGISTER_TYPE,
-    default: USER.REGISTER_TYPE.NORMAL,
+  @ApiProperty({
+    example: "['1529034801245']",
+    description: 'The teams that the user belongs to',
   })
-  registerType: string;
+  @Prop({ default: [] })
+  teamIds: string[];
+
+  @ApiProperty({
+    example: 'https://example.com/image.png',
+    description: 'The image url of the user avatar',
+  })
+  @Prop({ required: false })
+  avatar: string;
 
   @Prop({ default: now })
   createdAt: Date;

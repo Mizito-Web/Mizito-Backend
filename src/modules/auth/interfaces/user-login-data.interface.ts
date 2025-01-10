@@ -4,7 +4,6 @@ export interface UserLoginData {
   lastName: string;
   email: string;
   password: string;
-  registerType: string;
   type: string;
   status: string;
 }

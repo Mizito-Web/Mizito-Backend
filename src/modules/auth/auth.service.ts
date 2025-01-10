@@ -13,6 +13,7 @@ import { UsersService } from '../users/users.service';
 import { USER } from './constants/user.constants';
 import * as bcrypt from 'bcryptjs';
 import { RegisterDto } from './dto/register.dto';
+import { Roles } from './enums/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -120,11 +121,7 @@ export class AuthService {
       throw new NotAcceptableException('Email or Password is wrong');
     }
 
-    if (
-      user &&
-      user.registerType === USER.REGISTER_TYPE.NORMAL &&
-      !user?.password
-    ) {
+    if (user && !user?.password) {
       throw new NotAcceptableException('Email or Password is wrong');
     }
 
