@@ -12,6 +12,7 @@ import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service';
 import { USER } from './constants/user.constants';
 import * as bcrypt from 'bcryptjs';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -138,5 +139,24 @@ export class AuthService {
     delete user.password;
 
     return user;
+  }
+
+  async logout(userId: string) {
+    await this.usersService.updateUserRefreshToken(userId, null);
+
+    return 'Logged out!';
+  }
+
+  async register(data: RegisterDto) {
+    const { email, password } = data;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    return await this.usersService.createUser({
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      status: USER.STATUS.ACTIVE,
+      type: USER.TYPE.USER,
+    });
   }
 }
