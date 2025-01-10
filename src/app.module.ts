@@ -8,9 +8,26 @@ import { TasksModule } from './modules/tasks/tasks.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 configDotenv();
 @Module({
-  imports: [MongooseModule.forRoot(process.env.MONGO_URL), ProjectModule, TasksModule, UsersModule, AuthModule, ChatModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGO_URL'),
+      }),
+    }),
+    ProjectModule,
+    TasksModule,
+    UsersModule,
+    AuthModule,
+    ChatModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
