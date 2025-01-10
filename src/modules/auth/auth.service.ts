@@ -54,14 +54,20 @@ export class AuthService {
   async login(user: UserLoginData) {
     const payload = {
       email: user.email,
-      sub: user._id,
       type: user.type,
       status: user.status,
     };
+    user = await this.usersService.getUser({
+      email: user.email,
+    });
     const { access_token, refresh_token } = await this.generateTokens(payload);
     await this.hashAndSaveRefreshTokenInUser(user._id, refresh_token);
     return {
-      user,
+      user: {
+        email: user.email,
+        type: user.type,
+        status: user.status,
+      },
       access_token,
       refresh_token,
     };
