@@ -8,6 +8,13 @@ export class Project {
 
   @ApiProperty({
     example: '5129048051729380124',
+    description: 'The id of the owner of the project',
+  })
+  @Prop({ required: true })
+  ownerId: string;
+
+  @ApiProperty({
+    example: '5129048051729380124',
     description: 'The team that this project belongs to.',
   })
   @Prop({ required: true })

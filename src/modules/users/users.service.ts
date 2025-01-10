@@ -3,8 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './model/user.model';
 import { UserLoginData } from '../auth/interfaces/user-login-data.interface';
-import { USER } from '../auth/constants/user.constants';
-import { v4 as uuidv4 } from 'uuid';
 import { CreateUser } from './interfaces/create-user.interface';
 import { NewUser } from './interfaces/new-user.interface';
 
@@ -30,7 +28,7 @@ export class UsersService {
       .lean();
   }
 
-  async getUser(query: object): Promise<any> {
+  async getUser(query: object) {
     return await this.userModel.findOne(query);
   }
 

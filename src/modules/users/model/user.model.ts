@@ -7,6 +7,13 @@ import { USER } from 'src/modules/auth/constants/user.constants';
 export class User {
   _id: string;
 
+  @ApiProperty({
+    example: 'k3rn3lpanic',
+    description: 'The username of the user',
+  })
+  @Prop({ required: true, unique: true })
+  userName: string;
+
   @ApiProperty({ example: 'Bob', description: 'it is a first name' })
   @Prop({ required: false })
   firstName: string;
@@ -16,7 +23,7 @@ export class User {
   lastName: string;
 
   @ApiProperty({ example: 'example@email.com', description: 'it is an email' })
-  @Prop({ required: false })
+  @Prop({ required: true, unique: true })
   email: string;
 
   @Prop({ type: String, select: false })

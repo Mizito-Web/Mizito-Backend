@@ -1,11 +1,13 @@
 import { Date } from 'mongoose';
 
-export class CreateTaskDTO {
+export class TaskObject {
   title: string;
   description: string;
   projectId: string;
   memberIds: string[];
   dueDate?: Date;
-  priority?: number;
-  progress?: number;
+  priority?: Number;
+  progress?: Number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
