@@ -33,7 +33,7 @@ export class AuthController {
     description: 'Register using an email and password',
     type: User,
   })
-  @Post('/register')
+  @Post('/signup')
   async createUser(@Body() body: RegisterDto) {
     return await this.authService.register(body);
   }
@@ -42,7 +42,7 @@ export class AuthController {
   @ApiBody({ type: LoginUserDto })
   @ApiResponse({ status: 200, description: 'Return a JWT Token' })
   @UseGuards(LocalAuthGuard)
-  @Post('/login/basic')
+  @Post('/login')
   async login(@Body() req: UserLoginData) {
     return this.authService.login(req);
   }
