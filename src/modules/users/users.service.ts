@@ -26,7 +26,7 @@ export class UsersService {
 
   async getUserUsedValidateUser(query: object): Promise<UserLoginData> {
     return await this.userModel
-      .findOne(query, 'email password type status firstName lastName')
+      .findOne(query, 'email password status firstName lastName')
       .lean();
   }
 
@@ -40,7 +40,6 @@ export class UsersService {
     if (query.email) {
       existUser = await this.getUser({
         email: query.email,
-        type: query.type,
       });
     }
 
@@ -49,8 +48,8 @@ export class UsersService {
     }
 
     const user = await this.userModel.create(query);
-    const { email, status, type, _id }: NewUser = user;
+    const { email, status, _id }: NewUser = user;
 
-    return { email, status, type, _id };
+    return { email, status, _id };
   }
 }

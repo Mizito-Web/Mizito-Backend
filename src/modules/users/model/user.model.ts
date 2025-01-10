@@ -29,10 +29,6 @@ export class User {
   @Prop({ required: true, default: USER.STATUS.NEW, enum: USER.STATUS })
   status: string;
 
-  @ApiProperty({ example: 'ADMIN', description: 'it is a type of user' })
-  @Prop({ required: true, default: USER.TYPE.ADMIN, enum: USER.TYPE })
-  type: string;
-
   @ApiProperty({ example: '1234542453', description: 'it is a phone number' })
   @Prop({ required: false })
   phone: string;

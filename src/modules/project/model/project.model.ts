@@ -31,5 +31,5 @@ export class Project {
   updatedAt: Date;
 }
 
-export type TaskDocument = Project & Document;
+export type ProjectDocument = Project & Document;
 export const UserSchema = SchemaFactory.createForClass(Project);
