@@ -5,11 +5,16 @@ import { User, UserDocument } from './model/user.model';
 import { UserLoginData } from '../auth/interfaces/user-login-data.interface';
 import { CreateUser } from './interfaces/create-user.interface';
 import { NewUser } from './interfaces/new-user.interface';
+import { TeamDocument } from '../project/model/team.model';
+import { MemberShipDocument } from './model/membership.model';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(User.name) private readonly teamModel: Model<TeamDocument>,
+    @InjectModel(User.name)
+    private readonly membershipModel: Model<MemberShipDocument>
   ) {}
   async updateUserRefreshToken(userId: string, refreshToken: string | null) {
     await this.userModel.updateOne({ _id: userId }, { $set: { refreshToken } });
@@ -50,4 +55,14 @@ export class UsersService {
 
     return { email, status, _id };
   }
+
+  async isUserPartOfTeam(userId: string, teamId: string): Promise<boolean> {
+    const membership = await this.membershipModel.findOne({
+      userId,
+      teamId,
+    });
+    return !!membership;
+  }
+
+  async addUserToTeam() {}
 }

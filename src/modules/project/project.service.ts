@@ -7,18 +7,24 @@ import { CreateProjectDTO } from './dto/create-project.dto';
 import { Project, ProjectDocument } from './model/project.model';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ProjectService {
   constructor(
     @InjectModel(Project.name)
-    private readonly projectModel: Model<ProjectDocument>
+    private readonly projectModel: Model<ProjectDocument>,
+    private usersService: UsersService
   ) {}
   async getProjects(): Promise<
     { _id: string; name: string; imageUrl: string; teamId: string }[]
   > {
     const projects = await this.projectModel.find().lean();
     return projects;
+  }
+
+  async checkUserInTeam(userId: string, teamId: string) {
+    return await this.usersService.isUserPartOfTeam(userId, teamId);
   }
 
   async getProjectsByTeamId(teamId: string) {
@@ -76,4 +82,6 @@ export class ProjectService {
     if (!query) throw new ConflictException('Query not found');
     await this.projectModel.updateOne({ _id: projectId }, { $set: query });
   }
+
+  async addUserToProject(){}
 }

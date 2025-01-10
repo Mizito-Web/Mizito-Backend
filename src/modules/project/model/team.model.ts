@@ -27,5 +27,5 @@ export class Team {
   updatedAt: Date;
 }
 
-export type TaskDocument = Team & Document;
+export type TeamDocument = Team & Document;
 export const TeamSchema = SchemaFactory.createForClass(Team);
