@@ -43,7 +43,7 @@ export class Task {
     example: '5129048051729380124',
     description: 'The project that this task belongs to.',
   })
-  @Prop({ required: true, default: 0 })
+  @Prop({ required: true })
   projectId: string;
 
   @Prop({ default: now })
