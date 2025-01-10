@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Document, ObjectId, Types, now } from 'mongoose';
+import { Document, now } from 'mongoose';
 import { USER } from 'src/modules/auth/constants/user.constants';
 
 @Schema()
