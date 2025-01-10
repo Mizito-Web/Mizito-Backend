@@ -53,13 +53,13 @@ export class AuthService {
   }
 
   async login(user: UserLoginData) {
-    const payload = {
-      email: user.email,
-      status: user.status,
-    };
     user = await this.usersService.getUser({
       email: user.email,
     });
+    const payload = {
+      email: user.email,
+      id: user._id,
+    };
     const { access_token, refresh_token } = await this.generateTokens(payload);
     await this.hashAndSaveRefreshTokenInUser(user._id, refresh_token);
     return {
@@ -106,14 +106,13 @@ export class AuthService {
   ): Promise<Partial<UserLoginData>> {
     const findQuery = {
       email: email.toLowerCase(),
-      type: userType,
     };
 
     if (userType === 'USER') findQuery['type'] = USER.TYPE.USER;
     else if (userType === 'ADMIN') findQuery['type'] = USER.TYPE.ADMIN;
 
     const user = await this.usersService.getUserUsedValidateUser(findQuery);
-
+    console.log({ user });
     if (!user) {
       throw new NotAcceptableException('Email or Password is wrong');
     }

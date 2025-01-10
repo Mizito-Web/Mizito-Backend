@@ -8,6 +8,7 @@ import { ReportSchema, Report } from './model/report.model';
 import { UsersModule } from '../users/users.module';
 import { ProjectModule } from '../project/project.module';
 import { ProjectService } from '../project/project.service';
+import { Assignment, AssignmentSchema } from './model/assignment.model';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ProjectService } from '../project/project.service';
       { name: Task.name, schema: TaskSchema },
       { name: SubTask.name, schema: SubTaskSchema },
       { name: Report.name, schema: ReportSchema },
+      { name: Assignment.name, schema: AssignmentSchema },
     ]),
     forwardRef(() => UsersModule),
     forwardRef(() => ProjectModule),

@@ -17,7 +17,7 @@ export class UsersService {
   async getUserAndRefreshToken(userId: string): Promise<Partial<User>> {
     const user = await this.userModel.findById(
       userId,
-      'refreshToken _id email status type'
+      'refreshToken _id email'
     );
     return user;
   }

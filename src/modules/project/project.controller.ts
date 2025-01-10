@@ -26,16 +26,21 @@ export class ProjectController {
 
   @Post('/')
   createProject(@Body() data: CreateProjectDTO) {
-    return this.projectService.createProject(data);
+    const userId = '';
+    return this.projectService.createProject(userId, data);
   }
 
   @Put('/:projectId')
   updateProject(@Param('projectId') projectId: string, @Body() query: object) {
-    return this.projectService.updateProject(projectId, query);
+    const userId = '';
+
+    return this.projectService.updateProject(userId, projectId, query);
   }
 
   @Delete('/:projectId')
   removeProject(@Param('projectId') projectId: string) {
-    return this.projectService.removeProject(projectId);
+    const userId = '';
+
+    return this.projectService.removeProject(userId, projectId);
   }
 }

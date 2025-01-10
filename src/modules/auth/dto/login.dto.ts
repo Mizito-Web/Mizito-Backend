@@ -19,15 +19,4 @@ export class LoginUserDto {
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long.' })
   password: string;
-
-  @ApiProperty({
-    example: Roles.ADMIN,
-    enum: [Roles.ADMIN, Roles.USER],
-  })
-  @IsString()
-  @IsNotEmpty()
-  @IsEnum([Roles.ADMIN, Roles.USER], {
-    message: `userType should be ${Roles.ADMIN} or ${Roles.USER}`,
-  })
-  userType: Roles;
 }
