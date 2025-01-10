@@ -4,7 +4,7 @@ import { TasksController } from './tasks.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Task, TaskSchema } from './model/task.model';
 import { SubTask, SubTaskSchema } from './model/subtask.model';
-import { ReportSchema } from './model/report.model';
+import { ReportSchema, Report } from './model/report.model';
 
 @Module({
   imports: [

@@ -20,10 +20,10 @@ export class Team {
   @Prop({ required: false })
   imageUrl: string;
 
-  @Prop({ default: now })
+  @Prop({ default: now, type: Date })
   createdAt: Date;
 
-  @Prop({ default: now })
+  @Prop({ default: now, type: Date })
   updatedAt: Date;
 }
 

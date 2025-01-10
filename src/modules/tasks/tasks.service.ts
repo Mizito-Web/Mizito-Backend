@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Task, TaskDocument } from './model/task.model';
 import { Model } from 'mongoose';
 import { SubTask, SubTaskDocument } from './model/subtask.model';
-import { ReportDocument } from './model/report.model';
+import { ReportDocument, Report } from './model/report.model';
 
 @Injectable()
 export class TasksService {

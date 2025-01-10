@@ -55,7 +55,6 @@ export class AuthService {
   async login(user: UserLoginData) {
     const payload = {
       email: user.email,
-      type: user.type,
       status: user.status,
     };
     user = await this.usersService.getUser({
@@ -66,7 +65,6 @@ export class AuthService {
     return {
       user: {
         email: user.email,
-        type: user.type,
         status: user.status,
       },
       access_token,
@@ -93,7 +91,6 @@ export class AuthService {
     const { access_token, refresh_token } = await this.generateTokens({
       email: user.email,
       sub: String(user['_id']),
-      type: user.type,
       status: user.status,
     });
 
@@ -132,13 +129,6 @@ export class AuthService {
       }
     }
 
-    if (user.type === USER.TYPE.USER && user.status === USER.STATUS.NEW) {
-      throw new HttpException(
-        'Please verify your email address',
-        HttpStatus.UNAUTHORIZED
-      );
-    }
-
     delete user.password;
 
     return user;
@@ -159,7 +149,6 @@ export class AuthService {
       email: email.toLowerCase(),
       password: hashedPassword,
       status: USER.STATUS.ACTIVE,
-      type: USER.TYPE.USER,
     });
   }
 }

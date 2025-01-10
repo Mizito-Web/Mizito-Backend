@@ -20,10 +20,10 @@ export class Report {
   @Prop({ required: true })
   taskId: string;
 
-  @Prop({ default: now })
+  @Prop({ default: now, type: Date })
   createdAt: Date;
 
-  @Prop({ default: now })
+  @Prop({ default: now, type: Date })
   updatedAt: Date;
 }
 

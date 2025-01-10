@@ -21,14 +21,14 @@ export class Task {
     example: '12.4',
     description: 'The progress percentage of the task',
   })
-  @Prop({ required: true, default: 0 })
-  progress: Double;
+  @Prop({ required: true, default: 0, type: Number })
+  progress: Number;
 
   @ApiProperty({
     example: 'This task is about ...',
     description: 'The description of the task',
   })
-  @Prop({ required: false })
+  @Prop({ required: false, type: Date })
   dueDate: Date;
 
   @ApiProperty({
@@ -36,8 +36,8 @@ export class Task {
     description:
       'Priority of task. The higher the number, the higher the priority',
   })
-  @Prop({ required: false, default: 0 })
-  priority: Int32;
+  @Prop({ required: false, type: Number, default: 0 })
+  priority: Number;
 
   @ApiProperty({
     example: '5129048051729380124',
@@ -46,10 +46,10 @@ export class Task {
   @Prop({ required: true })
   projectId: string;
 
-  @Prop({ default: now })
+  @Prop({ default: now, type: Date })
   createdAt: Date;
 
-  @Prop({ default: now })
+  @Prop({ default: now, type: Date })
   updatedAt: Date;
 }
 
