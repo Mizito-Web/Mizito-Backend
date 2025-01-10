@@ -20,8 +20,8 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Mizito APIs')
     .setDescription('All APIs are here now.')
-    .setVersion('1.2')
-    .addTag('droplinked')
+    .setVersion('1.0')
+    .addTag('Mizito')
     .addBearerAuth()
     .build();
 
