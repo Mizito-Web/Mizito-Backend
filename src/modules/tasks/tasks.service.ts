@@ -33,11 +33,37 @@ export class TasksService {
     private projectService: ProjectService
   ) {}
 
-  async createTask(creatorId: string, data: CreateTaskDTO) {
-    const project = await this.projectService.getProject(data.projectId);
-    if (project.ownerId !== creatorId) {
+  private async getProjectOwner(projectId: string): Promise<string> {
+    const project = await this.projectService.getProject(projectId);
+    return project.ownerId;
+  }
+
+  private async validateTaskOwnership(
+    userId: string,
+    taskId: string
+  ): Promise<void> {
+    const task = await this.taskModel.findById(taskId).lean();
+    if (!task) throw new NotFoundException('Task not found');
+    const members = await this.getTaskMembers(taskId);
+    const owner = await this.getProjectOwner(task.projectId);
+    if (!members.includes(userId) && owner !== userId)
+      throw new UnauthorizedException(
+        'You are not a member of this task or the owner of this project'
+      );
+  }
+
+  private async validateProjectOwnership(userId: string, projectId: string) {
+    const project = await this.projectService.getProject(projectId);
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+    if (project.ownerId !== userId) {
       throw new UnauthorizedException('You are not the owner of this project');
     }
+  }
+
+  async createTask(creatorId: string, data: CreateTaskDTO) {
+    await this.validateProjectOwnership(creatorId, data.projectId);
     const task = await this.taskModel.create(data);
     task.save();
     return task;
@@ -63,14 +89,7 @@ export class TasksService {
   }
 
   async createSubTask(creatorId: string, data: CreateSubTaskDTO) {
-    if (!data.taskId) {
-      throw new NotFoundException('Task not found');
-    }
-    const members = await this.getTaskMembers(data.taskId);
-    if (!members.includes(creatorId)) {
-      throw new UnauthorizedException('You are not a member of this task');
-    }
-
+    await this.validateTaskOwnership(creatorId, data.taskId);
     const { title, taskId } = data;
     const subtask = {
       title,
@@ -83,16 +102,7 @@ export class TasksService {
   }
 
   async addReport(userId: string, data: CreateReportDTO) {
-    if (!data.taskId) {
-      throw new NotFoundException('Task not found');
-    }
-    const members = await this.getTaskMembers(data.taskId);
-    const owner = (await this.projectService.getProject(data.taskId)).ownerId;
-    if (!members.includes(userId) && owner !== userId) {
-      throw new UnauthorizedException(
-        'You are not a member of this task or owner of the project'
-      );
-    }
+    await this.validateTaskOwnership(userId, data.taskId);
     const report = await this.reportModel.create(data);
     report.save();
     return report;
@@ -109,18 +119,7 @@ export class TasksService {
   }
 
   async updateTaskDetails(userId: string, taskId: string, query: object) {
-    const task = await this.taskModel.findById(taskId).lean();
-    if (!task) {
-      throw new NotFoundException('Task not found');
-    }
-    const owner = (await this.projectService.getProject(task.projectId))
-      .ownerId;
-    const members = await this.getTaskMembers(taskId);
-    if (owner !== userId && !members.includes(userId)) {
-      throw new UnauthorizedException(
-        'You are not the owner of this project or a member of this task'
-      );
-    }
+    await this.validateTaskOwnership(userId, taskId);
     await this.taskModel.updateOne({ _id: taskId }, { $set: query });
   }
 
@@ -129,14 +128,7 @@ export class TasksService {
     if (!subTask) {
       throw new NotFoundException('Subtask not found');
     }
-    const owner = (await this.projectService.getProject(subTask.taskId))
-      .ownerId;
-    const members = await this.getTaskMembers(subTask.taskId);
-    if (owner !== userId && !members.includes(userId)) {
-      throw new UnauthorizedException(
-        'You are not the owner of this project or a member of this task'
-      );
-    }
+    await this.validateTaskOwnership(userId, subTask.taskId);
     await this.subTaskModel.updateOne({ _id: subTaskId }, { $set: query });
   }
 
@@ -145,12 +137,9 @@ export class TasksService {
     if (!report) {
       throw new NotFoundException('Report not found');
     }
-    const owner = (await this.projectService.getProject(report.taskId)).ownerId;
-    const members = await this.getTaskMembers(report.taskId);
-    if (owner !== userId && !members.includes(userId)) {
-      throw new UnauthorizedException(
-        'You are not the owner of this project or a member of this task'
-      );
+    await this.validateTaskOwnership(userId, report.taskId);
+    if (report.userId !== userId) {
+      throw new UnauthorizedException('You are not the creator of this report');
     }
     await this.reportModel.updateOne({ _id: reportId }, { $set: query });
   }
@@ -160,11 +149,7 @@ export class TasksService {
     if (!task) {
       throw new NotFoundException('Task not found');
     }
-    const owner = (await this.projectService.getProject(task.projectId))
-      .ownerId;
-    if (owner !== userId) {
-      throw new UnauthorizedException('You are not the owner of this project');
-    }
+    await this.validateProjectOwnership(userId, task.projectId);
     await this.taskModel.deleteOne({ _id: taskId });
   }
 
@@ -173,10 +158,7 @@ export class TasksService {
     if (!subTask) {
       throw new NotFoundException('Subtask not found');
     }
-    const members = await this.getTaskMembers(subTask.taskId);
-    if (!members.includes(userId)) {
-      throw new UnauthorizedException('You are not a member of this task');
-    }
+    await this.validateTaskOwnership(userId, subTask.taskId);
     await this.subTaskModel.deleteOne({ _id: subTaskId });
   }
 
@@ -200,10 +182,7 @@ export class TasksService {
       throw new UnauthorizedException('You are not the owner of this project');
     }
 
-    await this.taskModel.updateOne(
-      { _id: taskId },
-      { $push: { memberIds: addingUserId } }
-    );
+    await this.assignmentModel.create({ userId: addingUserId, taskId });
   }
 
   async removeMember(userId: string, removingUserId: string, taskId: string) {
@@ -221,9 +200,6 @@ export class TasksService {
       throw new UnauthorizedException('You are not the owner of this project');
     }
 
-    await this.taskModel.updateOne(
-      { _id: taskId },
-      { $pull: { memberIds: removingUserId } }
-    );
+    await this.assignmentModel.deleteOne({ userId: removingUserId, taskId });
   }
 }

@@ -20,6 +20,13 @@ export class Report {
   @Prop({ required: true })
   taskId: string;
 
+  @ApiProperty({
+    example: '5129048051729380124',
+    description: 'The user that created this report.',
+  })
+  @Prop({ required: true })
+  userId: string;
+
   @Prop({ default: now, type: Date })
   createdAt: Date;
 
