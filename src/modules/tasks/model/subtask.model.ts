@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Date, Document, now } from 'mongoose';
 
 @Schema()
-export class Task {
+export class SubTask {
   _id: string;
 
   @ApiProperty({
@@ -13,7 +13,7 @@ export class Task {
   @Prop({ required: true })
   taskId: string;
 
-  @ApiProperty({ example: 'Task1', description: 'The title of the task' })
+  @ApiProperty({ example: 'SubTask1', description: 'The title of the task' })
   @Prop({ required: true })
   title: string;
 
@@ -31,5 +31,5 @@ export class Task {
   updatedAt: Date;
 }
 
-export type TaskDocument = Task & Document;
-export const UserSchema = SchemaFactory.createForClass(Task);
+export type TaskDocument = SubTask & Document;
+export const UserSchema = SchemaFactory.createForClass(SubTask);
