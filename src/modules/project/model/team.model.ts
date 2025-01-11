@@ -7,6 +7,13 @@ export class Team {
   _id: string;
 
   @ApiProperty({
+    example: '5801924125',
+    description: 'Owner ID of the team',
+  })
+  @Prop({ required: true })
+  ownerId: string;
+
+  @ApiProperty({
     example: 'K3rn3lpanic team',
     description: 'Name of the team',
   })

@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Document, now } from 'mongoose';
 
 @Schema()
-export class MemberShip {
+export class TeamMemberShip {
   _id: string;
 
   @ApiProperty({
@@ -27,5 +27,6 @@ export class MemberShip {
   updatedAt: Date;
 }
 
-export type MemberShipDocument = MemberShip & Document;
-export const MemberShipSchema = SchemaFactory.createForClass(MemberShip);
+export type TeamMemberShipDocument = TeamMemberShip & Document;
+export const TeamMemberShipSchema =
+  SchemaFactory.createForClass(TeamMemberShip);
