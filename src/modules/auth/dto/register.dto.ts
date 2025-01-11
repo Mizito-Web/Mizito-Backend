@@ -25,4 +25,27 @@ export class RegisterDto {
     }
   )
   password: string;
+
+  @ApiProperty({ example: 'Bob' })
+  @IsNotEmpty()
+  @IsString()
+  firstName: string;
+
+  @ApiProperty({ example: 'Wang' })
+  @IsNotEmpty()
+  @IsString()
+  lastName: string;
+
+  @ApiProperty({ example: 'k3rn3lpanic' })
+  @IsNotEmpty()
+  @IsString()
+  userName: string;
+
+  @ApiPropertyOptional({ example: 'https://example.com/image.png' })
+  @IsString()
+  avatar?: string;
+
+  @ApiPropertyOptional({ example: '1234567890' })
+  @IsString()
+  phone?: string;
 }

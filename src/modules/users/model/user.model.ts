@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document, now } from 'mongoose';
-import { USER } from 'src/modules/auth/constants/user.constants';
 
 @Schema()
 export class User {
@@ -29,26 +28,12 @@ export class User {
   @Prop({ type: String, select: false })
   password: string;
 
-  @ApiProperty({
-    example: 'IMS_TYPE_COMPLETED',
-    description: 'it is a status of user',
-  })
-  @Prop({ required: true, default: USER.STATUS.NEW, enum: USER.STATUS })
-  status: string;
-
   @ApiProperty({ example: '1234542453', description: 'it is a phone number' })
   @Prop({ required: false })
   phone: string;
 
   @Prop({ required: false, select: false })
   refreshToken: string;
-
-  @ApiProperty({
-    example: "['1529034801245']",
-    description: 'The teams that the user belongs to',
-  })
-  @Prop({ default: [] })
-  teamIds: string[];
 
   @ApiProperty({
     example: 'https://example.com/image.png',

@@ -8,14 +8,14 @@ export class Assignment {
 
   @ApiProperty({ example: '15812903890124', description: 'The id of the task' })
   @Prop({ required: true })
-  taskId: string;
+  taskId: Types.ObjectId;
 
   @ApiProperty({
     example: '58120934123',
     description: 'The id of the user involved',
   })
   @Prop({ required: true })
-  userId: string;
+  userId: Types.ObjectId;
 
   @Prop({ default: now, type: Date })
   createdAt: Date;

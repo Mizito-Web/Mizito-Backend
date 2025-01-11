@@ -1,17 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Date, Document, now } from 'mongoose';
+import { Transform } from 'class-transformer';
+import { Date, Document, now, Types } from 'mongoose';
 
 @Schema()
 export class Team {
   _id: string;
 
+  @Transform(({ value }) => value.toString())
   @ApiProperty({
     example: '5801924125',
     description: 'Owner ID of the team',
   })
   @Prop({ required: true })
-  ownerId: string;
+  ownerId: Types.ObjectId;
 
   @ApiProperty({
     example: 'K3rn3lpanic team',

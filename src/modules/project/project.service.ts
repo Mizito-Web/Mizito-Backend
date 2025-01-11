@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateProjectDTO } from './dto/create-project.dto';
 import { Project, ProjectDocument } from './model/project.model';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UsersService } from '../users/users.service';
 import { MemberShip, MemberShipDocument } from './model/membership.model';
@@ -23,7 +23,12 @@ export class ProjectService {
     { _id: string; name: string; imageUrl: string; teamId: string }[]
   > {
     const projects = await this.projectModel.find().lean();
-    return projects;
+    return projects.map((project) => ({
+      _id: project._id.toString(),
+      name: project.name,
+      imageUrl: project.imageUrl,
+      teamId: project.teamId.toString(),
+    }));
   }
 
   async checkUserInTeam(userId: string, teamId: string) {
@@ -44,11 +49,12 @@ export class ProjectService {
     data: CreateProjectDTO
   ): Promise<{ _id: string; name: string; imageUrl: string; teamId: string }> {
     const { name, teamId, imageUrl } = data;
+    // check if the team exists
     const project = {
       name,
-      teamId,
+      teamId: new Types.ObjectId(teamId),
       imageUrl: imageUrl ? imageUrl : null,
-      ownerId: userId,
+      ownerId: new Types.ObjectId(userId),
     };
     const teamProjects = await this.getProjectsByTeamId(teamId);
     if (teamProjects.some((project) => project.name === name)) {
@@ -58,7 +64,12 @@ export class ProjectService {
     const newProject = await this.projectModel.create(project);
     newProject.save();
 
-    return { ...newProject };
+    return {
+      teamId: newProject.teamId.toString(),
+      _id: newProject._id.toString(),
+      name: newProject.name,
+      imageUrl: newProject.imageUrl,
+    };
   }
 
   async removeProject(userId: string, projectId: string) {
@@ -66,7 +77,7 @@ export class ProjectService {
     if (!project) {
       throw new ConflictException('Project not found');
     }
-    if (project.ownerId !== userId) {
+    if (project.ownerId.toString() !== userId) {
       throw new UnauthorizedException('You are not the owner of this project');
     }
 
@@ -84,7 +95,7 @@ export class ProjectService {
     if (!project) {
       throw new ConflictException('Project not found');
     }
-    if (userId !== project.ownerId) {
+    if (userId !== project.ownerId.toString()) {
       throw new UnauthorizedException('You are not the owner of this project');
     }
     if (!projectId) throw new ConflictException('Project not found');
@@ -100,19 +111,19 @@ export class ProjectService {
     const project = await this.getProject(projectId);
     const teamId = project.teamId;
     // check if the userId is the owner of the project
-    if (project.ownerId !== userId) {
+    if (project.ownerId.toString() !== userId) {
       throw new UnauthorizedException(
         'You are not the owner of this project. only the owner can add/remove members of project'
       );
     }
     // check if the user belongs to the team of project
-    if (!(await this.checkUserInTeam(addingUserId, teamId))) {
+    if (!(await this.checkUserInTeam(addingUserId, teamId.toString()))) {
       throw new ConflictException('User is not a member of this team.');
     }
     // add a new member to the project
     const memberShip = {
-      userId: addingUserId,
-      projectId: projectId,
+      userId: new Types.ObjectId(addingUserId),
+      projectId: new Types.ObjectId(projectId),
     };
     const isAlreadyMember = await this.memberShipModel.findOne(memberShip);
     if (isAlreadyMember) {
@@ -147,7 +158,7 @@ export class ProjectService {
     }
     const teamId = project.teamId;
     // check if the userId is the owner of the project
-    if (project.ownerId !== userId) {
+    if (project.ownerId.toString() !== userId) {
       throw new UnauthorizedException(
         'You are not the owner of this project. only the owner can add/remove members of project'
       );

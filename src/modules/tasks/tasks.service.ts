@@ -17,6 +17,7 @@ import { Assignment, AssignmentDocument } from './model/assignment.model';
 import { TaskObject } from './dto/task.dto';
 import { SubTaskObject } from './dto/subtask.dto';
 import { CreateReportDTO } from './dto/create-report.dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class TasksService {
@@ -35,7 +36,7 @@ export class TasksService {
 
   private async getProjectOwner(projectId: string): Promise<string> {
     const project = await this.projectService.getProject(projectId);
-    return project.ownerId;
+    return project.ownerId.toString();
   }
 
   private async validateTaskOwnership(
@@ -46,7 +47,7 @@ export class TasksService {
     if (!task) throw new NotFoundException('Task not found');
     const members = await this.getTaskMembers(taskId);
     const owner = await this.getProjectOwner(task.projectId);
-    if (!members.includes(userId) && owner !== userId)
+    if (!members.includes(new Types.ObjectId(userId)) && owner !== userId)
       throw new UnauthorizedException(
         'You are not a member of this task or the owner of this project'
       );
@@ -57,7 +58,7 @@ export class TasksService {
     if (!project) {
       throw new NotFoundException('Project not found');
     }
-    if (project.ownerId !== userId) {
+    if (project.ownerId.toString() !== userId) {
       throw new UnauthorizedException('You are not the owner of this project');
     }
   }
@@ -115,7 +116,7 @@ export class TasksService {
   async getTask(taskId: string): Promise<TaskObject> {
     const task = await this.taskModel.findById(taskId).lean();
     const members = await this.getTaskMembers(taskId);
-    return { ...task, memberIds: members };
+    return { ...task, memberIds: members.map((member) => member.toString()) };
   }
 
   async updateTaskDetails(userId: string, taskId: string, query: object) {
@@ -173,12 +174,12 @@ export class TasksService {
       throw new NotFoundException('Task not found');
     }
     const members = await this.getTaskMembers(taskId);
-    if (members.includes(addingUserId)) {
+    if (members.includes(new Types.ObjectId(addingUserId))) {
       throw new ConflictException('User is already a member of this task');
     }
     const owner = (await this.projectService.getProject(task.projectId))
       .ownerId;
-    if (owner !== userId) {
+    if (owner.toString() !== userId) {
       throw new UnauthorizedException('You are not the owner of this project');
     }
 
@@ -191,12 +192,12 @@ export class TasksService {
       throw new NotFoundException('Task not found');
     }
     const members = await this.getTaskMembers(taskId);
-    if (!members.includes(removingUserId)) {
+    if (!members.includes(new Types.ObjectId(removingUserId))) {
       throw new ConflictException('User is not a member of this task');
     }
     const owner = (await this.projectService.getProject(task.projectId))
       .ownerId;
-    if (owner !== userId) {
+    if (owner.toString() !== userId) {
       throw new UnauthorizedException('You are not the owner of this project');
     }
 

@@ -53,7 +53,13 @@ export class ProjectController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new project' })
-  @ApiBody({ type: CreateProjectDTO })
+  @ApiBody({ schema: {
+    example: {
+      name: 'Project1',
+      teamId: '5129048051729380124',
+      imageUrl: 'https://example.com/image.png'
+    }
+  } })
   @ApiResponse({ status: 201, description: 'Project created successfully.' })
   @ApiResponse({ status: 409, description: 'Project already exists.' })
   @Post('/')

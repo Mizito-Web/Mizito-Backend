@@ -4,8 +4,8 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectModel, Schema } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
 import { User, UserDocument } from './model/user.model';
 import { UserLoginData } from '../auth/interfaces/user-login-data.interface';
 import { CreateUser } from './interfaces/create-user.interface';
@@ -16,6 +16,8 @@ import {
   TeamMemberShipDocument,
 } from './model/membership.model';
 import { CreateTeamDTO } from '../project/dto/create-team.dto';
+import { RegisterDto } from '../auth/dto/register.dto';
+import { ObjectId } from 'mongoose';
 
 @Injectable()
 export class UsersService {
@@ -38,15 +40,16 @@ export class UsersService {
 
   async getUserUsedValidateUser(query: object): Promise<UserLoginData> {
     return await this.userModel
-      .findOne(query, 'email password status firstName lastName')
+      .findOne(query, 'email password firstName lastName')
       .lean();
   }
 
   async getUser(query: object) {
-    return await this.userModel.findOne(query);
+    const user = await this.userModel.findOne(query).lean();
+    return user;
   }
 
-  async createUser(query: Partial<CreateUser>): Promise<NewUser> {
+  async createUser(query: Partial<RegisterDto>): Promise<NewUser> {
     let existUser;
 
     if (query.email) {
@@ -60,22 +63,26 @@ export class UsersService {
     }
 
     const user = await this.userModel.create(query);
-    const { email, status, _id }: NewUser = user;
+    const { email, _id }: NewUser = user;
 
-    return { email, status, _id };
+    return { email, _id };
   }
 
   async isUserPartOfTeam(userId: string, teamId: string): Promise<boolean> {
     const membership = await this.teamMembershipModel.findOne({
-      userId,
-      teamId,
+      userId: new Types.ObjectId(userId),
+      teamId: new Types.ObjectId(teamId),
     });
     return !!membership;
   }
 
+  async updateUser(userId: string, query: object) {
+    await this.userModel.updateOne({ _id: userId }, { $set: query });
+  }
+
   async createTeam(userId: string, data: CreateTeamDTO) {
     const teamData = {
-      ownerId: userId,
+      ownerId: new Types.ObjectId(userId),
       ...data,
     };
     const newTeam = await this.teamModel.create(teamData);
@@ -83,15 +90,24 @@ export class UsersService {
     return newTeam;
   }
 
+  async removeTeam(userId: string, teamId: string) {
+    const team = await this.teamModel.findById(teamId).lean();
+    if (!team) throw new NotFoundException('Team not found');
+    if (team.ownerId.toString() !== userId) {
+      throw new UnauthorizedException('You are not the owner of this team');
+    }
+    await this.teamModel.deleteOne({ _id: teamId });
+  }
+
   async addUserToTeam(userId: string, addingUserId: string, teamId: string) {
     const team = await this.teamModel.findById(teamId).lean();
     if (!team) throw new NotFoundException('Team not found');
-    if (team.ownerId !== userId) {
+    if (team.ownerId.toString() !== userId) {
       throw new UnauthorizedException('You are not the owner of this team');
     }
     const memberShip = {
-      userId: addingUserId,
-      teamId: teamId,
+      userId: new Types.ObjectId(addingUserId),
+      teamId: new Types.ObjectId(teamId),
     };
     const isAlreadyMember = await this.teamMembershipModel
       .findOne(memberShip)
@@ -102,5 +118,29 @@ export class UsersService {
     const newMemberShip = await this.teamMembershipModel.create(memberShip);
     newMemberShip.save();
     return newMemberShip;
+  }
+
+  async removeUserFromTeam(
+    userId: string,
+    removingUserId: string,
+    teamId: string
+  ) {
+    const team = await this.teamModel.findById(teamId).lean();
+    if (!team) throw new NotFoundException('Team not found');
+    if (team.ownerId.toString() !== userId) {
+      throw new UnauthorizedException('You are not the owner of this team');
+    }
+    const memberShip = {
+      userId: removingUserId,
+      teamId: teamId,
+    };
+    const isAlreadyMember = await this.teamMembershipModel
+      .findOne(memberShip)
+      .lean();
+    if (!isAlreadyMember) {
+      throw new ConflictException('User is not a member of this team.');
+    }
+    await this.teamMembershipModel.deleteOne(memberShip);
+    return true;
   }
 }

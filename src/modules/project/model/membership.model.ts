@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 import { Date, Document, now } from 'mongoose';
 
 @Schema()
@@ -11,14 +12,14 @@ export class MemberShip {
     description: 'Id of the member',
   })
   @Prop({ required: true })
-  userId: string;
+  userId: Types.ObjectId;
 
   @ApiProperty({
     example: '5109234854123',
     description: 'Id of the team',
   })
   @Prop({ required: true })
-  projectId: string;
+  projectId: Types.ObjectId;
 
   @Prop({ default: now, type: Date })
   createdAt: Date;

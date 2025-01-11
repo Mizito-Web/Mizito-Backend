@@ -65,7 +65,6 @@ export class AuthService {
     return {
       user: {
         email: user.email,
-        status: user.status,
       },
       access_token,
       refresh_token,
@@ -91,7 +90,6 @@ export class AuthService {
     const { access_token, refresh_token } = await this.generateTokens({
       email: user.email,
       sub: String(user['_id']),
-      status: user.status,
     });
 
     await this.hashAndSaveRefreshTokenInUser(userId, refresh_token);
@@ -112,7 +110,6 @@ export class AuthService {
     else if (userType === 'ADMIN') findQuery['type'] = USER.TYPE.ADMIN;
 
     const user = await this.usersService.getUserUsedValidateUser(findQuery);
-    console.log({ user });
     if (!user) {
       throw new NotAcceptableException('Email or Password is wrong');
     }
@@ -147,7 +144,11 @@ export class AuthService {
     return await this.usersService.createUser({
       email: email.toLowerCase(),
       password: hashedPassword,
-      status: USER.STATUS.ACTIVE,
+      userName: data.userName,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      avatar: data.avatar,
+      phone: data.phone,
     });
   }
 }
