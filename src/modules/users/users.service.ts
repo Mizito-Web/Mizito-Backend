@@ -17,13 +17,15 @@ import {
 } from './model/membership.model';
 import { CreateTeamDTO } from '../project/dto/create-team.dto';
 import { RegisterDto } from '../auth/dto/register.dto';
-import { ObjectId } from 'mongoose';
+import { Invitation, InvitationDocument } from './model/invitation.model';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @InjectModel(Team.name) private readonly teamModel: Model<TeamDocument>,
+    @InjectModel(Invitation.name)
+    private readonly invitationModel: Model<InvitationDocument>,
     @InjectModel(TeamMemberShip.name)
     private readonly teamMembershipModel: Model<TeamMemberShipDocument>
   ) {}
@@ -142,5 +144,50 @@ export class UsersService {
     }
     await this.teamMembershipModel.deleteOne(memberShip);
     return true;
+  }
+
+  async inviteUser(userId: string, invitedUserId: string, teamId: string) {
+    // check if the userId is the owner of the team
+    const team = await this.teamModel.findOne({ teamId }).lean();
+    if (!team) {
+      throw new NotFoundException('The team does not exist');
+    }
+    const user = await this.userModel.findOne({ _id: userId });
+    if (!user) {
+      throw new NotFoundException('The given user does not exist');
+    }
+    if (team.ownerId.toString() !== userId) {
+      throw new UnauthorizedException(
+        'Only the owner of the team can send invitations'
+      );
+    }
+    const invitation = {
+      userId: invitedUserId,
+      invitingId: userId,
+      teamId: teamId,
+      hasAccepted: false,
+    };
+    const newInvitation = await this.invitationModel.create(invitation);
+    newInvitation.save();
+    return newInvitation;
+  }
+
+  async acceptInvitation(userId: string, invitationId: string) {
+    const invitation = await this.invitationModel.findOne({
+      _id: invitationId,
+    });
+    if (!invitation) {
+      throw new NotFoundException('The invitation does not exist');
+    }
+    if (invitation.userId.toString() !== userId) {
+      throw new UnauthorizedException('This invitation is not for you');
+    }
+    invitation.hasAccepted = true;
+    invitation.save();
+    return await this.addUserToTeam(
+      invitation.invitingId.toString(),
+      userId,
+      invitation.teamId.toString()
+    );
   }
 }

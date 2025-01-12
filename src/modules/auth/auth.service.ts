@@ -10,7 +10,6 @@ import { JwtService } from '@nestjs/jwt';
 import { UserLoginData } from './interfaces/user-login-data.interface';
 import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service';
-import { USER } from './constants/user.constants';
 import * as bcrypt from 'bcryptjs';
 import { RegisterDto } from './dto/register.dto';
 import { Roles } from './enums/role.enum';
@@ -99,15 +98,11 @@ export class AuthService {
 
   async validateUser(
     email: string,
-    password: string,
-    userType: string
+    password: string
   ): Promise<Partial<UserLoginData>> {
     const findQuery = {
       email: email.toLowerCase(),
     };
-
-    if (userType === 'USER') findQuery['type'] = USER.TYPE.USER;
-    else if (userType === 'ADMIN') findQuery['type'] = USER.TYPE.ADMIN;
 
     const user = await this.usersService.getUserUsedValidateUser(findQuery);
     if (!user) {

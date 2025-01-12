@@ -20,6 +20,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     email: string,
     password: string
   ): Promise<Partial<UserLoginData>> {
-    return this.authService.validateUser(email, password, req.body.userType);
+    return this.authService.validateUser(email, password);
   }
 }

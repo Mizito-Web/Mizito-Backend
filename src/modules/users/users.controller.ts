@@ -89,7 +89,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Add a user to a team' })
+  @ApiOperation({ summary: 'Invite a user to a team' })
   @ApiBody({
     schema: {
       example: {
@@ -99,7 +99,7 @@ export class UsersController {
   })
   @ApiResponse({
     status: 201,
-    description: 'User added to the team successfully.',
+    description: 'Invited user to team successfully.',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized access.' })
   @ApiResponse({ status: 404, description: 'Team not found.' })
@@ -107,18 +107,40 @@ export class UsersController {
     status: 409,
     description: 'User is already a member of the team.',
   })
-  @Post('/teams/:teamId/members')
-  async addUserToTeam(
+  @Post('/teams/:teamId/members/invitation')
+  async inviteUserToTeam(
     @Req() req: { user: { id: string } },
     @Param('teamId') teamId: string,
     @Body('userId') userId: string
   ) {
-    return await this.usersService.addUserToTeam(req.user.id, userId, teamId);
+    return await this.usersService.inviteUser(req.user.id, userId, teamId);
   }
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Add a user to a team' })
+  @ApiOperation({ summary: 'Accept an team invitation' })
+  @ApiResponse({
+    status: 201,
+    description: 'Invitation has been accepted successfully.',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized access.' })
+  @ApiResponse({ status: 404, description: 'Team not found.' })
+  @ApiResponse({
+    status: 409,
+    description: 'User is already a member of the team.',
+  })
+  @Post('/teams/:teamId/members/invitation/:invitationId')
+  async acceptInvitation(
+    @Req() req: { user: { id: string } },
+    @Param('teamId') teamId: string,
+    @Param('invitationId') invitationId: string
+  ) {
+    return await this.usersService.acceptInvitation(req.user.id, invitationId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Remove a user from team' })
   @ApiResponse({
     status: 201,
     description: 'User removed from the team successfully.',
@@ -155,4 +177,12 @@ export class UsersController {
   ) {
     return await this.usersService.removeTeam(req.user.id, teamId);
   }
+
+  /*
+  TODO: list
+  Get team,
+  update team,
+  Delete account
+
+  */
 }
